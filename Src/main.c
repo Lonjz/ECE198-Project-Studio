@@ -104,13 +104,7 @@ int main(void)
 	int angle_xz = Calculate_XZ_Angle_Int();
 	printf("Angle in XZ plane: %d degrees\r\n", angle_xz);
 
-	if (angle_xz > 85 && angle_xz < 95) {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	} else {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-	}
-
-	HAL_Delay(1000000);
+	HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
