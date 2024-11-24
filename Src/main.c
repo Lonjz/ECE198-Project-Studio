@@ -8,6 +8,7 @@ I2C_HandleTypeDef hi2c1;
 #define LSM6DSOX_ADDR 0x6A << 1
 #define CTRL1_XL 0x10
 #define OUTX_L_A 0x28
+#define OUTZ_L_A 0x2C
 
 UART_HandleTypeDef huart2;
 
@@ -36,7 +37,7 @@ int16_t Read_Axis(uint8_t reg) {
 
 float Calculate_XZ_Angle() {
     int16_t x_raw = Read_Axis(OUTX_L_A);
-    int16_t z_raw = Read_Axis(OUTX_L_A + 4);
+    int16_t z_raw = Read_Axis(OUTZ_L_A);
     float x_g = x_raw / 16384.0;
     float z_g = z_raw / 16384.0;
     float angle = atan2(z_g, x_g) * (180.0 / M_PI);
@@ -53,7 +54,7 @@ static void MX_I2C1_Init(void);
 
 int Calculate_XZ_Angle_Int() {
     int16_t x_raw = Read_Axis(OUTX_L_A);
-    int16_t z_raw = Read_Axis(OUTX_L_A + 4);
+    int16_t z_raw = Read_Axis(OUTX_L_A);
     float x_g = x_raw / 16384.0;
     float z_g = z_raw / 16384.0;
     int angle = (int)(atan2(z_g, x_g) * (180.0 / M_PI) + 0.5);
