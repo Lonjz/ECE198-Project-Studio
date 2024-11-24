@@ -36,6 +36,15 @@ uint32_t Read_ADC(void) {
     return 0;
 }
 
+
+void Control_Vibration(int angle, uint32_t vibration_level) {
+    if (angle < 30 || vibration_level > 1000) {
+        HAL_GPIO_WritePin(VIBRATION_PORT, VIBRATION_PIN, GPIO_PIN_SET);
+    } else {
+        HAL_GPIO_WritePin(VIBRATION_PORT, VIBRATION_PIN, GPIO_PIN_RESET);
+    }
+}
+
 void LSM6DSOX_Init() {
     uint8_t config[2];
     config[0] = CTRL1_XL;
