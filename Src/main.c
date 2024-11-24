@@ -36,9 +36,10 @@ uint32_t Read_ADC(void) {
     return 0;
 }
 
+void Control_Vibration(int angle) {
+    uint32_t vibration_level = Read_ADC();
 
-void Control_Vibration(int angle, uint32_t vibration_level) {
-    if (angle < 30 || vibration_level > 1000) {
+    if (angle < 30 && vibration_level > 1000) {
         HAL_GPIO_WritePin(VIBRATION_PORT, VIBRATION_PIN, GPIO_PIN_SET);
     } else {
         HAL_GPIO_WritePin(VIBRATION_PORT, VIBRATION_PIN, GPIO_PIN_RESET);
@@ -56,6 +57,40 @@ int16_t Read_Axis(uint8_t reg) {
     uint8_t data[2];
     HAL_I2C_Mem_Read(&hi2c1, LSM6DSOX_ADDR, reg, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
     return (int16_t)(data[1] << 8 | data[0]);
+}
+
+static void MX_ADC1_Init(void) {
+    ADC_ChannelConfTypeDef sConfig = {0};
+
+    __HAL_RCC_ADC1_CLK_ENABLE();
+
+    hadc1.Instance = ADC1;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.NbrOfDiscConversion = 1;
+    hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T1_CC1;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    HAL_ADC_Init(&hadc1);
+
+    sConfig.Channel = ADC_CHANNEL_0;
+    sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+}
+
+static void MX_GPIO_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();  // Enable GPIOA clock
+
+    GPIO_InitStruct.Pin = VIBRATION_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(VIBRATION_PORT, &GPIO_InitStruct);
 }
 
 float Calculate_XZ_Angle() {
@@ -157,28 +192,6 @@ static void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
-}
-
-static void MX_ADC1_Init(void) {
-    ADC_ChannelConfTypeDef sConfig = {0};
-
-    __HAL_RCC_ADC1_CLK_ENABLE();
-
-    hadc1.Instance = ADC1;
-    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-    hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-    hadc1.Init.ContinuousConvMode = DISABLE;
-    hadc1.Init.DiscontinuousConvMode = DISABLE;
-    hadc1.Init.NbrOfDiscConversion = 1;
-    hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T1_CC1;
-    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-    hadc1.Init.NbrOfConversion = 1;
-    HAL_ADC_Init(&hadc1);
-
-    sConfig.Channel = ADC_CHANNEL_0;
-    sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
-    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
 }
 
 static void MX_USART2_UART_Init(void)
