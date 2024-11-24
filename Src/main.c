@@ -57,7 +57,13 @@ int Calculate_XZ_Angle_Int() {
     int16_t z_raw = Read_Axis(OUTX_L_A);
     float x_g = x_raw / 16384.0;
     float z_g = z_raw / 16384.0;
-    int angle = (int)(atan2(z_g, x_g) * (180.0 / M_PI) + 0.5);
+    float magnitude = sqrt(x_g * x_g + z_g * z_g);
+
+    if (magnitude < 0.25) {
+        return 0;
+    }
+
+    float angle = atan2(z_g, x_g) * (180.0 / M_PI);
     return angle;
 }
 
