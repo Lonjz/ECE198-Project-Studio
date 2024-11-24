@@ -98,12 +98,15 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   LSM6DSOX_Init();
+  MX_ADC1_Init();
   printf("Hello STM32 UART!\r\n");
 
   while (1)
   {
 	int angle_xz = Calculate_XZ_Angle_Int();
+	uint32_t vibration_level = Read_ADC();
 	printf("Angle in XZ plane: %d degrees\r\n", angle_xz);
+	Control_Vibration(angle_xz, vibration_level);
 	HAL_Delay(1000);
   }
 }
@@ -154,6 +157,28 @@ static void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
+}
+
+static void MX_ADC1_Init(void) {
+    ADC_ChannelConfTypeDef sConfig = {0};
+
+    __HAL_RCC_ADC1_CLK_ENABLE();
+
+    hadc1.Instance = ADC1;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.NbrOfDiscConversion = 1;
+    hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T1_CC1;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    HAL_ADC_Init(&hadc1);
+
+    sConfig.Channel = ADC_CHANNEL_0;
+    sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
 }
 
 static void MX_USART2_UART_Init(void)
