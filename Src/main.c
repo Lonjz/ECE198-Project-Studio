@@ -3,6 +3,10 @@
 #include "math.h"
 #include <stdio.h>
 
+#define VIBRATION_PIN GPIO_PIN_5
+#define VIBRATION_PORT GPIOA
+#define ADXL1201_PIN GPIO_PIN_0
+
 I2C_HandleTypeDef hi2c1;
 
 #define LSM6DSOX_ADDR 0x6A << 1
