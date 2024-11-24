@@ -26,6 +26,16 @@ int _write(int file, char *ptr, int len) {
     return len;
 }
 
+ADC_HandleTypeDef hadc1;
+
+uint32_t Read_ADC(void) {
+    HAL_ADC_Start(&hadc1);
+    if (HAL_ADC_PollForConversion(&hadc1, 1000000) == HAL_OK) {
+        return HAL_ADC_GetValue(&hadc1);
+    }
+    return 0;
+}
+
 void LSM6DSOX_Init() {
     uint8_t config[2];
     config[0] = CTRL1_XL;
